@@ -12,7 +12,8 @@
 
         function link() {
             if(!isConnected){
-                const url = 'ws://127.0.0.1:1042?role=Pager';
+                const port = document.getElementById('port').value || '1042';
+                const url = `ws://127.0.0.1:${port}?role=Pager`;
 
                 server = new WebSocket(url);
                 server.onopen = () => {
@@ -31,25 +32,49 @@
 
         function send() {
 			if(server){
-                server.send(JSON.stringify({
-                    command: 'broadcastEvent',
-                    target: {
-                        role: 'Pager',
-                    },
-                    msg: {
-                        id: '123',
-                        text: '123',
-                    }
-                }));
+                const text = document.getElementById('payload').value || '';
+
+                server.send(JSON.stringify(text));
             }
 		}
 
+        window.onload = function(){
+            document.getElementById('payload').value = JSON.stringify({
+                command: 'broadcastEvent',
+                target: {
+                    role: 'Pager',
+                },
+                msg: {
+                    id: '123',
+                    text: '123',
+                }
+            }, undefined, 4);
+
+        }
+
 	</script>
+
+    <style>
+        .caption{
+            width: 100px;
+        }
+    </style>
 </head>
 
 <body>
     <div id="root">
-        <button id="linkWebsocket" onclick="link()">linkWebsocket</button>
+        <div>
+            <div class="caption">Port</div>
+            <input type="text" id="port" value="1042">
+        </div>
+        </br>
+        <div>
+            <div class="caption">Payload</div>
+            <textarea type="" id="payload" wrap="hard" rows="10" cols="50">
+            </textarea>
+        </div>
+
+        <button id="connectWebsocket" onclick="link()">connectWebsocket</button>
         <button id="sendMessage" onclick="send()">sendMessage</button>
 	</div>
 </body>
