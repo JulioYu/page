@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Test</title>
+	<script>
+        let server = null;
+        let isConnected = false;
+
+        function link() {
+            if(!isConnected){
+                const url = 'ws://127.0.0.1:1042?role=Pager';
+
+                server = new WebSocket(url);
+                server.onopen = () => {
+                    console.log('connected');
+
+                    isConnected = true;
+                };
+                server.onerror = () => {
+                    console.log('connection error');
+                };
+                server.onmessage = (evt) => {
+                    console.log(JSON.stringify(evt?.data, null, 4));
+                };
+            }
+        }
+
+        function send() {
+			if(server){
+                server.send(JSON.stringify({
+                    command: 'broadcastEvent',
+                    target: {
+                        role: 'Pager',
+                    },
+                    msg: {
+                        id: '123',
+                        text: '123',
+                    }
+                }));
+            }
+		}
+
+	</script>
+</head>
+
+<body>
+    <div id="root">
+        <button id="linkWebsocket" onclick="link()">linkWebsocket</button>
+        <button id="sendMessage" onclick="send()">sendMessage</button>
+	</div>
+</body>
+
+</html>
