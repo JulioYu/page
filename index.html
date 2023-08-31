@@ -6,54 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>Test</title>
-	<script>
-        let server = null;
-        let isConnected = false;
 
-        function link() {
-            if(!isConnected){
-                const port = document.getElementById('port').value || '1042';
-                const url = `ws://127.0.0.1:${port}?role=Pager`;
-
-                server = new WebSocket(url);
-                server.onopen = () => {
-                    console.log('connected');
-
-                    isConnected = true;
-                };
-                server.onerror = () => {
-                    console.log('connection error');
-                };
-                server.onmessage = (evt) => {
-                    console.log(JSON.stringify(evt?.data, null, 4));
-                };
-            }
-        }
-
-        function send() {
-			if(server){
-                const text = document.getElementById('payload').value || '';
-
-                server.send(JSON.stringify(text));
-            }
-		}
-
-        window.onload = function(){
-            document.getElementById('payload').value = JSON.stringify({
-                command: 'broadcastEvent',
-                target: {
-                    role: 'Pager',
-                },
-                msg: {
-                    id: '123',
-                    text: '123',
-                }
-            }, undefined, 4);
-
-        }
-
-	</script>
-
+    <script defer="defer" src="index.js"></script>
     <style>
         .caption{
             width: 100px;
@@ -74,8 +28,9 @@
             </textarea>
         </div>
 
-        <button id="connectWebsocket" onclick="link()">connectWebsocket</button>
-        <button id="sendMessage" onclick="send()">sendMessage</button>
+        <button id="connectWebsocket">connectWebsocket</button>
+        <button id="sendMessage">sendMessage</button>
+        <button id="getVersion">getVersion</button>
 	</div>
 </body>
 
