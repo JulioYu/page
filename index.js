@@ -1,78 +1,92 @@
-let server = null;
-let isConnected = false;
+// CSRF Token
+const token = generateUUID();
 
-function link() {
-    if(!isConnected){
-        const port = document.getElementById('port').value || '1042';
-        const url = `ws://127.0.0.1:${port}?role=Pager`;
+document.cookie = `csrf-token=${token}`;
 
-        server = new WebSocket(url);
-        server.onopen = () => {
-            console.log('connected');
+window.onload = function () {
+    const sendAgentButton = document.getElementById('send2Agent');
+    const sendServerButton = document.getElementById('send2Server');
+    const serverURI = document.getElementById('serverURI');
 
-            isConnected = true;
-        };
-        server.onerror = () => {
-            console.log('connection error');
-        };
-        server.onmessage = (evt) => {
-            console.log(JSON.stringify(evt?.data, null, 4));
-        };
-    }
+    serverURI.value = window.location.origin + '/api/1/version';
+
+    sendAgentButton.onclick = () => {
+        sendAgent();
+    };
+    sendServerButton.onclick = () => {
+        sendServer();
+    };
 }
 
-function send() {
-    if(server){
-        const text = document.getElementById('payload').value || '';
+function sendAgent() {
+    const uri = document.getElementById('agentURI');
+    const method = document.getElementById('agentMethod');
+    const payload = document.getElementById('agentPayload');
+    const response = document.getElementById('agentResponse');
+    const methodValue = method.value;
 
-        server.send(JSON.stringify(text));
-    }
-}
-
-function getVersion() {
-    const text = document.getElementById('payload');
-
-    fetch('http://127.0.0.1:5000/api/1/version')
-        .then((response) => response.arrayBuffer())
+    fetch(uri.value, {
+        method: methodValue,
+        ...(methodValue === 'post') && {
+            body: payload.value,
+        },
+        mode: 'no-cors',
+    })
+        .then((res) => res.json())
         .then((result) => {
             try {
-                const data = String.fromCharCode.apply(null, new Uint16Array(result));
-
-                text.value = data;
+                response.value = result;
             } catch (e) {
                 throw new Error(e);
             }
         })
         .catch((result) => {
-            text.value = result;
+            response.value = result;
         });
 }
 
-window.onload = function () {
-    const connectWebsocketButton = document.getElementById('connectWebsocket');
-    const sendMessageButton = document.getElementById('sendMessage');
-    const getVersionButton = document.getElementById('getVersion');
+function sendServer() {
+    const uri = document.getElementById('serverURI');
+    const method = document.getElementById('serverMethod');
+    const payload = document.getElementById('serverPayload');
+    const response = document.getElementById('serverResponse');
+    const methodValue = method.value;
 
-    connectWebsocketButton.onclick = () => {
-        link();
-    };
-    sendMessageButton.onclick = () => {
-        send();
-    };
-    getVersionButton.onclick = () => {
-        getVersion();
-    };
-
-
-    document.getElementById('payload').value = JSON.stringify({
-        command: 'broadcastEvent',
-        target: {
-            role: 'Pager',
+    fetch(uri.value, {
+        method: methodValue,
+        ...(methodValue === 'post') && {
+            body: payload.value,
         },
-        msg: {
-            id: '123',
-            text: '123',
-        }
-    }, undefined, 4);
+        headers: {
+            'XSRF-TOKEN': token,
+        },
+    })
+        .then((res) => res.arrayBuffer())
+        .then((result) => {
+            try {
+                const data = String.fromCharCode.apply(null, new Uint16Array(result));
 
+                response.value = data;
+            } catch (e) {
+                throw new Error(e);
+            }
+        })
+        .catch((result) => {
+            response.value = result;
+        });
+}
+
+function generateUUID() {
+    let d = Date.now();
+
+    if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
+        d += performance.now();
+    }
+
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = (d + Math.random() * 16) % 16 | 0;
+        d = Math.floor(d / 16);
+
+        return (c === 'x' ? r : ((r && 0x3) || 0x8)).toString(16);
+    });
 }

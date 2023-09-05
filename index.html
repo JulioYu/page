@@ -9,6 +9,16 @@
 
     <script defer="defer" src="index.js"></script>
     <style>
+        body {
+            display: flex;
+            justify-content: center;
+        }
+        .root {
+            width: 80%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+        }
         .caption{
             width: 100px;
         }
@@ -16,21 +26,51 @@
 </head>
 
 <body>
-    <div id="root">
-        <div>
-            <div class="caption">Port</div>
-            <input type="text" id="port" value="1042">
+    <div id="root" class="root">
+        <div class="block">
+            <div>
+                <div class="caption">Agent URI</div>
+                <input type="text" id="agentURI" value="http://127.0.0.1:6000/" style="width: 300px;">
+                <select id="agentMethod">
+                    <option value="get">GET</option>
+                    <option value="post">POST</option>
+                </select>
+            </div>
+            </br>
+            <div>
+                <div class="caption">Payload</div>
+                <textarea type="" id="agentPayload" wrap="hard" rows="10" cols="50"></textarea>
+            </div>
+            <div>
+                <div class="caption">Response</div>
+                <textarea type="" id="agentResponse" wrap="hard" rows="10" cols="50"></textarea>
+            </div>
+            <div>
+                <button id="send2Agent">Send</button>
+            </div>
         </div>
-        </br>
-        <div>
-            <div class="caption">Payload</div>
-            <textarea type="" id="payload" wrap="hard" rows="10" cols="50">
-            </textarea>
+        <div class="block">
+            <div>
+                <div class="caption">Server URI</div>
+                <input type="text" id="serverURI" value="./api/1/version" style="width: 300px;">
+                <select id="serverMethod">
+                    <option value="get">GET</option>
+                    <option value="post">POST</option>
+                </select>
+            </div>
+            </br>
+            <div>
+                <div class="caption">Payload</div>
+                <textarea type="" id="serverPayload" wrap="hard" rows="10" cols="50"></textarea>
+            </div>
+            <div>
+                <div class="caption">Response</div>
+                <textarea type="" id="serverResponse" wrap="hard" rows="10" cols="50"></textarea>
+            </div>
+            <div>
+                <button id="send2Server">Send</button>
+            </div>
         </div>
-
-        <button id="connectWebsocket">connectWebsocket</button>
-        <button id="sendMessage">sendMessage</button>
-        <button id="getVersion">getVersion</button>
 	</div>
 </body>
 
